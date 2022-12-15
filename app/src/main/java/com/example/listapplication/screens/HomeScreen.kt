@@ -1,11 +1,10 @@
 package com.example.listapplication.screens
 
+import android.content.ClipData.Item
 import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Card
@@ -15,8 +14,17 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coil.compose.AsyncImagePainter
+import coil.compose.rememberAsyncImagePainter
+import coil.compose.rememberImagePainter
+import coil.request.ImageRequest
+import coil.transform.CircleCropTransformation
+import com.example.listapplication.model.Items
+import com.example.listapplication.model.getItems
+
 import com.example.listapplication.navigation.ListScreens
 
 
@@ -35,25 +43,23 @@ fun HomeScreen(navController: NavController) {
 }
 
 @Composable
-fun ListWithRow(navController: NavController,
-    listView: List<String> = listOf(
-        "Name",
-        "Adhithya",
-        "Ramakumar"
-    )
+fun ListWithRow(
+    navController: NavController,
+    listView: List<Items> = getItems()
 ) {
     LazyColumn(modifier = Modifier.padding(12.dp)) {
         items(items = listView) {
-            RowWithCard(name = it) { item ->
-                navController.navigate(route = ListScreens.DetailsScreen.name+"/$item")
+            RowWithCard(item = it) { item ->
+                navController.navigate(route = ListScreens.DetailsScreen.name + "/$item")
             }
         }
     }
 }
 
+
 @Composable
 fun RowWithCard(
-    name: String,
+    item: Items,
     onItemClick: (String) -> Unit = {}
 ) {
     Row(modifier = Modifier.padding(8.dp)) {
@@ -63,11 +69,25 @@ fun RowWithCard(
                 .fillMaxWidth()
                 .height(500.dp)
                 .clickable {
-                    onItemClick(name)
+                    onItemClick(item.id)
                 },
             elevation = 7.dp
         ) {
-            Text(modifier = Modifier.padding(4.dp), text = name)
+            Column() {
+                Image(
+                    painter = rememberAsyncImagePainter(
+                        ImageRequest.Builder(LocalContext.current).data(item.poster)
+                            .apply(block = fun ImageRequest.Builder.() {
+                                crossfade(true)
+                                transformations(CircleCropTransformation())
+                            }).build()
+                    ),
+                    contentDescription = "Adhi",
+                )
+                Text(modifier = Modifier.padding(4.dp), text = item.title)
+                Text(text = item.plot)
+            }
+
         }
     }
 }

@@ -28,7 +28,10 @@ fun ListNavigation() {
                 type = NavType.StringType
             })
         ) { backStackEntry ->
-            DetailsScreen(navController = navController, backStackEntry.arguments?.getString("listItem"))
+            DetailsScreen(
+                navController = navController,
+                backStackEntry.arguments?.getString("listItem")
+            )
         }
     }
 }
